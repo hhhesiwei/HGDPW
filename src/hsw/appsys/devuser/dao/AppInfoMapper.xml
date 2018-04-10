@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hsw.appsys.devuser.dao.AppInfoDao">
+	<resultMap type="AppInfo" id="AppInfoMap">
+		 <result column="ai_id" property="id"/>
+	  <result column="softwareName" property="softwareName"/>
+	  <result column="APKName" property="APKName"/>
+	  <result column="supportROM" property="supportROM"/>
+	  <result column="softwareSize" property="softwareSize"/>
+	  <result column="downloads" property="downloads"/>
+	  <result column="flateform" property="flateformName"/>
+	  <result column="status_name" property="statusName"/>
+	  <result column="interfaceLanguage" property="interfaceLanguage"/>
+		 <!-- 配置一对一关系 -->
+	  <!-- 配置一级分类 -->
+	  <association property="cateLevel1" javaType="AppCategory">
+	  	<result column="categoryLevel1" property="id"/>
+	  	<result column="cn1" property="categoryName"/>
+	  </association>
+	   <!-- 配置二级分类 -->
+	   <association property="cateLevel2" javaType="AppCategory">
+	  	<result column="categoryLevel2" property="id"/>
+	  	<result column="cn2" property="categoryName"/>
+	  </association>
+	   <!-- 配置三级分类 -->
+	   <association property="cateLevel3" javaType="AppCategory">
+	  	<result column="categoryLevel3" property="id"/>
+	  	<result column="cn3" property="categoryName"/>
+	  </association>
+	  <association property="version" javaType="AppVersion">
+	  	<result column="versionID" property="id"/>
+	  	<result column="versionNO" property="versionNo"/>
+	  </association>
+	</resultMap>
+	
+	
+	<resultMap type="AppInfo" id="getAppInfoMap">
+	  <id column="id" property="id"/>
+	  <result column="softwareName" property="softwareName"/> <!-- 软件名称 -->
+	  <result column="APKName" property="APKName"/> <!-- APK名称 -->
+	  <result column="supportROM" property="supportROM"/> <!-- ROM -->
+	  <result column="softwareSize" property="softwareSize"/> <!-- 软件大小 -->
+	  <result column="downloads" property="downloads"/> <!-- 下载次数 -->
+	  <result column="interfaceLanguage" property="interfaceLanguage"/><!-- 界面语言 -->
+	  <result column="flateformName" property="flateformName"/>
+	   <result column="logoPicPath" property="logoPicPath"/>
+	  <result column="statusName" property="statusName"/>
+	  <result column="appInfo" property="appInfo"/>
+	  <!-- 配置一对一关系 -->
+	  <!-- 一级分类 -->
+	 <association property="cateLevel1" javaType="AppCategory">
+	  <result column="cateLevel1Name" property="categoryName"/>
+	  </association>
+	  <!-- 二级分类 -->
+	  <association property="cateLevel2" javaType="AppCategory">
+	  <result column="cateLevel2Name" property="categoryName"/>
+	  </association>
+	  <!-- 三级分类 -->
+	  <association property="cateLevel3" javaType="AppCategory">
+	  <result column="cateLevel3Name" property="categoryName"/>
+	  </association>
+	  
+	</resultMap>
+	<select id="getAppInfoTotal" parameterType="AppInfoPage" resultType="int">
+		SELECT COUNT(*) FROM app_view
+		 <where>
+			<if test="softwareName != null and softwareName != ''">
+			AND softwareName LIKE concat('%',#{softwareName},'%')
+		</if>
+		<if test="flatformId != 0">
+			AND flatformId = #{flatformId}
+		</if>
+		<if test="status!=0">
+			AND STATUS = #{status}
+		</if>
+			<if test="cateLevel1 !=null and cateLevel1.id != 0">
+			AND categoryLevel1= #{cateLevel1.id}
+		</if>
+			<if test="cateLevel2 !=null and cateLevel2.id != 0">
+			AND categoryLevel2 = #{cateLevel2.id}
+		</if>
+			<if test="cateLevel3 !=null and cateLevel3.id != 0">
+			AND categoryLevel3 = #{cateLevel3.id}
+		</if>
+		<if test="devId != 0">
+		AND devId = #{devId}
+		</if>
+	</where>
+	</select>
+	<select id="getAppInfoList" parameterType="AppInfoPage" resultMap="AppInfoMap">
+		SELECT * FROM `app_view`
+		<where>
+			<if test='softwareName != null and softwareName !=""'>
+			AND softwareName LIKE concat('%',#{softwareName},'%')
+		</if>
+		<if test="flatformId != 0">
+			AND flatformId = #{flatformId}
+		</if>
+		<if test="status!=0">
+			AND STATUS = #{status}
+		</if>
+		<if test="cateLevel1 !=null and cateLevel1.id != 0">
+			AND categoryLevel1= #{cateLevel1.id}
+		</if>
+		<if test="cateLevel2 != null and cateLevel2.id != 0">
+			AND categoryLevel2 = #{cateLevel2.id}
+		</if>
+		<if test="cateLevel3 != null and cateLevel3.id != 0">
+			AND categoryLevel3 = #{cateLevel3.id}
+		</if>
+		<if test="devId != 0">
+		AND devId = #{devId}
+		</if>
+		</where>
+		 limit #{startIndex},#{pageRows}
+	</select>
+	<select id="getAppInfo" parameterType="Integer" resultMap="getAppInfoMap">
+		SELECT * ,
+			(SELECT devName FROM`dev_user` WHERE id = a.`devId`),
+			(SELECT valueName FROM `data_dictionary` dd WHERE a.`status` = dd.valueId AND dd.typeCode = 'APP_STATUS' ) statusName,
+			(SELECT valueName FROM `data_dictionary` dd WHERE a.flatformId = dd.valueId AND dd.typeCode = 'APP_FLATFORM') flateformName,
+			(SELECT categoryName FROM `app_category` ac WHERE a.`categoryLevel1`= ac.id) cateLevel1Name,
+			(SELECT categoryName FROM `app_category` ac WHERE a.`categoryLevel2`= ac.id) cateLevel2Name,
+			(SELECT categoryName FROM `app_category` ac WHERE a.`categoryLevel3`= ac.id) cateLevel3Name
+			FROM app_info a 
+			WHERE a.id = #{id}
+	</select>
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>ApplnfoSystemDay</display-name>
+ <!--加载applicationContext-mybatis.xml -->
+<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext-mybatis.xml</param-value>
+  </context-param>
+
+<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+
+<!-- springMVC配置文件的文件名由核心控制器servlet的servlet-name来决定
+    比如servlet-name配置值为springmvc则springmvc的配置文件的文件名为
+    springmvc-servlet.xml -->
+<servlet>
+  	 <servlet-name>springmvc</servlet-name>
+<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+
+<!-- 如果springmvc的配置文件放在web.xml目录下，则无需指定文件位置
+    如果springmvc的配置文件放在src或resource文件夹下，则需要使用
+一下init-param来进行设置 -->   
+<init-param>
+<param-name>contextConfigLocation</param-name>
+  		<param-value>classpath:springmvc-servlet.xml</param-value>
+  	</init-param>
+	<load-on-startup>1</load-on-startup>  	
+  </servlet>
+
+
+
+<!-- 
+	/*是拦截所有请求，包括视图解析后跳转的.jsp页面，/则不会拦截视图解析后的.jsp页面！  
+   -->
+<servlet-mapping>
+  	<servlet-name>springmvc</servlet-name>
+  	<url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>

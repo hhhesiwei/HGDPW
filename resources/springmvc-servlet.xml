@@ -1,0 +1,72 @@
+<beans 
+	xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+ xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+                 default-autowire="byType">
+		<!-- 
+		mvc:annotation-driven /> 是一种简写形式，完全可以手动配置替代这种简写形式，
+		简写形式可以让初学都快速应用默认配置方案。
+		<mvc:annotation-driven /> 
+		会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,
+		是spring MVC为@Controllers分发请求所必须的。
+		 -->		
+<mvc:annotation-driven>
+   		<mvc:message-converters>
+   			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+   				<property name="supportedMediaTypes">
+   					<list>
+   						<value>application/json;charset=UTF-8</value>
+   					</list>
+   				</property>
+   			</bean>
+   			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+   				<property name="supportedMediaTypes">
+   					<list>
+   						<value>text/html;charset=UTF-8</value>
+   						<value>application/json</value>
+   					</list>
+   				</property>
+   				<property name="features">
+   					<list>
+   						<value>WriteDateUseDateFormat</value>
+   					</list>
+   				</property>
+   			</bean>
+   		</mvc:message-converters>
+   </mvc:annotation-driven>
+
+        <!-- 需要设置视图解析器 -->
+        <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+       		 <!-- 设置网页存在的位置 -->
+       		<property name="prefix" value="/WEB-INF/jsp/"></property>
+     	  	<!-- 网页的后缀 -->
+       		<property name="suffix" value=".jsp"></property>
+        </bean>
+
+  <!--此标签是对包进行扫描,实现注解驱动Bean的定义,同时将Bean自动注入容器中使用,即:使标注了SpringMVC注解(如@Controller等)的Bean生效.换句话说,若没有配置此标签,name标注@Controller的Bean仅仅是普通的JavaBean,而不是一个可以处理请求的控制器 -->
+		<context:component-scan 
+base-package="hsw.appsys.controller"></context:component-scan>
+
+        <!-- 
+        location元素表示webapp目录下的statics包下的所有文件；
+		mapping元素表示以/statics开头的所有请求路径，如/static/a 或者/static/a/b；
+		该配置的作用是：DispatcherServlet不会拦截以/statics开头的所有请求路径，并当作静态资源交由Servlet处理。
+         -->	
+ <mvc:resources location="/statics/" mapping="/statics/**"></mvc:resources>
+ 	<!-- 配置拦截器 -->
+ 	<mvc:interceptors>
+ 		<mvc:interceptor>
+ 			<mvc:mapping path="/dev/**"/>
+ 			<bean class="hsw.appsys.interceptor.AppsysInterceptor"></bean>
+ 		</mvc:interceptor>
+ 	</mvc:interceptors>
+  </beans>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hsw.appsys.devuser.dao.AppVersionDao">
+	<select id="getVersionList" parameterType="Integer" resultType="AppVersion">
+		SELECT av.*,ai.`softwareName`,dd.valueName
+		FROM (`app_version` av
+		INNER JOIN `app_info` ai ON av.appId = ai.id)
+		INNER JOIN `data_dictionary` dd ON dd.valueId = av.`publishStatus`
+		AND dd.typeCode = 'PUBLISH_STATUS'
+		WHERE ai.id = #{id}
+	</select>
+</mapper>
