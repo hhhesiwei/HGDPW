@@ -7,6 +7,7 @@
                 <h3>当前登录信息：${loginUser.devName }</h3>
               </div>
               </div>
+              
               <div class="clearfix"></div>
             <div class="row">
               	<!-- 复制 -->
